@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clevora | Inteligencia de Movilidad & Telemetría Satelital</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #02040a;
+            --bg-card: rgba(10, 16, 30, 0.55);
+            --border-glow: rgba(0, 210, 255, 0.25);
+            --cyan-glow: #00f0ff;
+            --blue-glow: #3a7bd5;
+            --purple-glow: #7000ff;
+            --accent-green: #00ff88;
+            --text-main: #f0f4f8;
+            --text-dim: #8a99ad;
+            --font-head: 'Space Grotesk', 'Orbitron', sans-serif;
+            --font-body: 'Sora', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: default;
+        }
+
+        html, body {
+            width: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            selection-background-color: var(--cyan-glow);
+            selection-color: #000;
+        }
+
+        /* Canvas Base */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Cursor Custom Spotlight */
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,240,255,0.08) 0%, rgba(112,0,255,0.03) 50%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Grid Background Overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 2;
+            pointer-events: none;
+            mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+        }
+
+        /* UI Overlay Layer */
+        .content-layer {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+        }
+
+        /* Header / Navbar */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            background: rgba(2, 4, 10, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--cyan-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--cyan-glow);
+            text-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+        .btn-glow {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(112, 0, 255, 0.15));
+            border: 1px solid var(--cyan-glow);
+            color: #fff;
+            border-radius: 30px;
+            font-family: var(--font-head);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), inset 0 0 15px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+            color: #fff;
+            border-color: #ffffff;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 8%;
+            position: relative;
+            padding-top: 80px;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: var(--font-head);
+            letter-spacing: 2px;
+            color: var(--cyan-glow);
+            width: fit-content;
+            margin-bottom: 24px;
+            backdrop-filter: blur(8px);
+        }
+
+        .hero h1 {
+            font-family: var(--font-head);
+            font-size: clamp(2.8rem, 6.5vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -1px;
+            max-width: 800px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 30%, var(--cyan-glow) 70%, var(--purple-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            max-width: 580px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-secondary {
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            border-radius: 30px;
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyan-glow);
+            color: var(--cyan-glow);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        /* Metrics Bar */
+        .metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            padding: 40px 8%;
+            margin-top: -60px;
+            position: relative;
+            z-index: 4;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s, border-color 0.4s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--cyan-glow);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .metric-value {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .metric-value span {
+            color: var(--cyan-glow);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 120px 8%;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-subtitle {
+            font-family: var(--font-head);
+            color: var(--cyan-glow);
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .section-title {
+            font-family: var(--font-head);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Section: Quiénes Somos / Telemetry HUD */
+        .hud-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hud-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 30px;
+            height: 30px;
+            border-top: 2px solid var(--cyan-glow);
+            border-left: 2px solid var(--cyan-glow);
+            border-top-left-radius: 20px;
+        }
+
+        .hud-card p {
+            color: var(--text-dim);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        .data-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .pill {
+            padding: 8px 16px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: var(--font-head);
+            color: var(--cyan-glow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modules Holographic Cards Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .holo-card {
+            background: rgba(10, 16, 30, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 36px;
+            position: relative;
+            backdrop-filter: blur(16px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .holo-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+            transition: 0.6s;
+        }
+
+        .holo-card:hover::after {
+            left: 100%;
+        }
+
+        .holo-card:hover {
+            transform: translateY(-10px) rotateX(4deg) rotateY(-4deg);
+            border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--cyan-glow);
+        }
+
+        .card-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .holo-card h3 {
+            font-family: var(--font-head);
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .holo-card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Feature List Styling */
+        .feature-list {
+            list-style: none;
+            margin-top: 16px;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .feature-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--cyan-glow);
+        }
+
+        /* Mobility Score Dashboard Section */
+        .dashboard-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 28px;
+            padding: 50px;
+            backdrop-filter: blur(30px);
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 50px;
+            align-items: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .score-circle-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-svg {
+            width: 220px;
+            height: 220px;
+            transform: rotate(-90deg);
+        }
+
+        .score-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 12;
+        }
+
+        .score-progress {
+            fill: none;
+            stroke: url(#score-gradient);
+            stroke-width: 12;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 565;
+            transition: stroke-dashoffset 2s ease-out;
+            stroke-linecap: round;
+        }
+
+        .score-display {
+            position: absolute;
+            text-align: center;
+        }
+
+        .score-num {
+            font-family: var(--font-head);
+            font-size: 4rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .metrics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .metric-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-family: var(--font-head);
+        }
+
+        .metric-info span:last-child {
+            color: var(--cyan-glow);
+            font-weight: 600;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue-glow), var(--cyan-glow));
+            border-radius: 4px;
+            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Futuristic Contact Console */
+        .console-box {
+            background: rgba(8, 12, 24, 0.75);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 50px;
+            backdrop-filter: blur(20px);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.08);
+        }
+
+        .console-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .console-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .console-dot.red { background: #ff5f56; }
+        .console-dot.yellow { background: #ffbd2e; }
+        .console-dot.green { background: #27c93f; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-family: var(--font-head);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .input-glow {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-glow:focus {
+            border-color: var(--cyan-glow);
+            background: rgba(0, 240, 255, 0.05);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        textarea.input-glow {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            padding: 80px 8% 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            background: rgba(2, 4, 10, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 30px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--cyan-glow);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hud-grid, .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full {
+                grid-column: span 1;
+            }
+            nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas Background -->
+    <div id="webgl-container"></div>
+
+    <!-- Mouse Glow Effect -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Digital Grid Mesh Overlay -->
+    <div class="grid-overlay"></div>
+
+    <div class="content-layer">
+        <!-- Navigation Header -->
+        <header>
+            <a href="#" class="logo">
+                <div class="logo-dot"></div>
+                CLEVORA
+            </a>
+            <nav>
+                <a href="#conocenos">Conócenos</a>
+                <a href="#soluciones">Soluciones</a>
+                <a href="#caracteristicas">Características</a>
+                <a href="#modulos">Módulos</a>
+                <a href="#score">Mobility Score</a>
+                <a href="#contacto">Contacto</a>
+            </nav>
+            <a href="#contacto" class="btn-glow">DEMO DIRECTA</a>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="badge-tag">
+                <span style="display:inline-block; width:6px; height:6px; background:var(--cyan-glow); border-radius:50%;"></span>
+                SISTEMA OPERATIVO DE TELEMETRÍA 4.0
+            </div>
+            <h1>Tu flota.<br><span class="text-gradient">Monitoreada en tiempo real.</span></h1>
+            <p>Clevora transforma datos operativos de movilidad en decisiones estratégicas de alto impacto mediante telemetría satelital e Inteligencia Artificial.</p>
+            <div class="hero-actions">
+                <a href="#contacto" class="btn-glow">COMENZAR GRATIS</a>
+                <a href="#soluciones" class="btn-secondary">VER DEMOSTRACIÓN &rarr;</a>
+            </div>
+        </section>
+
+        <!-- Live Metrics Section -->
+        <div class="metrics-bar">
+            <div class="metric-card">
+                <div class="metric-value">+<span class="counter" data-target="12000">0</span></div>
+                <div class="metric-label">Activos Conectados</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value"><span class="counter" data-target="99.8">0</span>%</div>
+                <div class="metric-label">Uptime Garantizado</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">&lt;<span class="counter" data-target="2">0</span>s</div>
+                <div class="metric-label">Latencia Telemetría</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">+<span class="counter" data-target="300">0</span></div>
+                <div class="metric-label">Empresas Activas</div>
+            </div>
+        </div>
+
+        <!-- Section: Soluciones -->
+        <section id="soluciones">
+            <div class="section-header" style="text-align: center;">
+                <span class="section-subtitle">// ECOSISTEMA DE MOVILIDAD</span>
+                <h2 class="section-title">Nuestras Soluciones</h2>
+                <p style="color: var(--text-dim); margin-top: 12px;">Soluciones adaptables diseñadas para optimizar la cadena operativa de transporte.</p>
+            </div>
+
+            <div class="modules-grid">
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                    </div>
+                    <h3>Telemetría Avanzada</h3>
+                    <p>Captura, procesamiento y análisis de variables operativas de la unidad en tiempo real para un control operativo total.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                    <h3>Seguridad y Prevención</h3>
+                    <p>Módulos integrados para la reducción proactiva de colisiones, control de accesos y protección constante de la unidad.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <h3>Gestión Eficiente</h3>
+                    <p>Automatización de mantenimientos, control riguroso de consumo de combustible e historial operativo completo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Características Clave -->
+        <section id="caracteristicas">
+            <div class="hud-grid">
+                <div class="hud-card">
+                    <span class="section-subtitle">// PLATAFORMA DE ALTO RENDIMIENTO</span>
+                    <h3 style="font-family: var(--font-head); color: #fff; font-size: 1.8rem; margin-bottom: 16px;">Infraestructura y Tecnología</h3>
+                    <p>Arquitectura escalable basada en la nube que permite visibilidad completa sobre activos terrestres sin demoras.</p>
+                    <div class="data-pills">
+                        <div class="pill">⚡ 0.2s RESPUESTA</div>
+                        <div class="pill">🔒 CIFRADO DE PUNTA A PUNTA</div>
+                        <div class="pill">🌐 API REST INTEGRABLE</div>
+                    </div>
+                </div>
+                <div>
+                    <span class="section-subtitle">// VENTAJAS COMPETITIVAS</span>
+                    <h2 class="section-title">Características Clave</h2>
+                    <ul class="feature-list" style="margin-top: 24px;">
+                        <li><strong>Monitoreo en Tiempo Real:</strong> Ubicación exacta, estado del motor, lecturas telemáticas y alertas inmediatas.</li>
+                        <li><strong>Plataforma 100% Web:</strong> Accede a tus datos desde cualquier dispositivo, navegador o ubicación sin instalaciones pesadas.</li>
+                        <li><strong>Integración Multimarca:</strong> Compatible con amplia variedad de hardware, GPS y sensores CAN-BUS del mercado.</li>
+                        <li><strong>Reportes y Analítica:</strong> Tableros dinámicos para auditorías, optimización de combustible y hábitos de conducción.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Módulos -->
+        <section id="modulos">
+            <div class="section-header" style="text-align: center;">
+                <span class="section-subtitle">// MÓDULOS DEL SISTEMA</span>
+                <h2 class="section-title">Una plataforma. Todo integrado.</h2>
+                <p style="color: var(--text-dim); margin-top: 12px;">Desde administración hasta informes ejecutivos, sin fricción.</p>
+            </div>
+
+            <div class="modules-grid">
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    </div>
+                    <h3>Gestión y Control Presencial</h3>
+                    <p>Bloqueo y desbloqueo en tiempo real, apagado remoto seguro y monitoreo de aperturas de puertas.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    </div>
+                    <h3>Mapa en Vivo Ultra-Rápido</h3>
+                    <p>Visualiza en tiempo real la posición de tus vehículos con cero latencia, velocidad y alertas por geocercas.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    </div>
+                    <h3>Puntuación de Movilidad</h3>
+                    <p>Califica de 1 a 100 a tus conductores y activos basándote en velocidad, frenadas bruscas y cumplimiento.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>Control de Conductores</h3>
+                    <p>Historial individual, perfiles de hábito de manejo y tendencias de comportamiento para viajes más seguros.</p>
+                </div>
+
+                <div class="holo-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <h3>Alertas Inteligentes</h3>
+                    <p>Clasificación automática por prioridad de eventos críticos, mantenimientos y fallas mecánicas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Mobility Score Dashboard -->
+        <section id="score">
+            <div class="section-header">
+                <span class="section-subtitle">// EVALUACIÓN ALGORÍTMICA</span>
+                <h2 class="section-title">Datos que se convierten en decisiones.</h2>
+            </div>
+
+            <div class="dashboard-container">
+                <div class="score-circle-box">
+                    <svg class="score-svg">
+                        <defs>
+                            <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00f0ff" />
+                                <stop offset="100%" stop-color="#7000ff" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="score-bg" cx="110" cy="110" r="90" />
+                        <circle class="score-progress" id="scoreCircle" cx="110" cy="110" r="90" />
+                    </svg>
+                    <div class="score-display">
+                        <div class="score-num" id="scoreNum">87</div>
+                        <div class="score-label">Puntuación / 100</div>
+                    </div>
+                </div>
+
+                <div class="metrics-list">
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span>Seguridad Vial</span>
+                            <span>92%</span>
+                        </div>
+                        <div class="bar-bg"><div class="bar-fill" data-width="92%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span>Eficiencia de Combustible</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="bar-bg"><div class="bar-fill" data-width="85%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span>Mantenimiento Preventivo</span>
+                            <span>96%</span>
+                        </div>
+                        <div class="bar-bg"><div class="bar-fill" data-width="96%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span>Puntualidad de Rutas</span>
+                            <span>88%</span>
+                        </div>
+                        <div class="bar-bg"><div class="bar-fill" data-width="88%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Conócenos -->
+        <section id="conocenos">
+            <div class="hud-grid">
+                <div>
+                    <span class="section-subtitle">// NUESTRA VISIÓN</span>
+                    <h2 class="section-title">¿Quiénes somos?</h2>
+                    <p style="margin-top: 20px; color: var(--text-dim); line-height: 1.8;">
+                        En <strong>Clevora</strong> somos una plataforma de inteligencia para la movilidad que transforma millones de datos provenientes de vehículos en información útil y estratégica para la toma de decisiones.
+                    </p>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-top: 15px;">
+                        Desarrollamos soluciones telemáticas de última generación diseñadas para brindar control absoluto, eficiencia e inteligencia predictiva a flotas empresariales de gran escala.
+                    </p>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-top: 15px;">
+                        Nuestro compromiso se centra en la optimización logística con soporte especializado para comprender, anticipar y mejorar la movilidad de tu negocio.
+                    </p>
+                    <p style="color: var(--cyan-glow); font-family: var(--font-head); font-weight: 700; font-size: 1.2rem; margin-top: 25px;">
+                        Conecta tu flota al futuro. ¡Conócenos!
+                    </p>
+                </div>
+                <div class="hud-card">
+                    <h3 style="font-family: var(--font-head); color: #fff; margin-bottom: 16px;">Infraestructura de Nivel Orbital</h3>
+                    <p>Procesamiento constante para miles de activos sincronizados en tiempo cero mediante enlaces satelitales dedicados.</p>
+                    <div class="data-pills">
+                        <div class="pill">📡 CONEXIÓN SATELITAL</div>
+                        <div class="pill">📊 MIGRACIÓN DE DATOS</div>
+                        <div class="pill">🧠 IA PREDICTIVA</div>
+                        <div class="pill">⚡ SOPORTE 24/7</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Contacto -->
+        <section id="contacto">
+            <div class="console-box">
+                <div class="console-header">
+                    <div class="console-dot red"></div>
+                    <div class="console-dot yellow"></div>
+                    <div class="console-dot green"></div>
+                    <span style="font-family: var(--font-head); font-size: 0.8rem; color: var(--text-dim); margin-left: auto;">TERMINAL_CONTACTO_CLEVORA_v4.2</span>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-family: var(--font-head); font-size: 1.8rem; color: #fff;">Lleva tu flota al siguiente nivel</h2>
+                    <p style="color: var(--text-dim); font-size: 0.95rem; margin-top: 8px;">
+                        Optimiza costos, mejora la seguridad y obtén control absoluto en tiempo real. Déjanos tus datos para agendar una demostración en vivo.
+                    </p>
+                </div>
+
+                <form class="form-grid" onsubmit="event.preventDefault(); alert('Iniciando conexión con consola...');">
+                    <div class="form-group">
+                        <label>Tu nombre</label>
+                        <input type="text" class="input-glow" placeholder="Ej: Alex Mercer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" class="input-glow" placeholder="alex@empresa.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de servicio</label>
+                        <select class="input-glow" style="background: rgba(8, 12, 24, 0.9);">
+                            <option>Gestión Flotas</option>
+                            <option>Telemetría GPS</option>
+                            <option>Inteligencia Predictiva</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cantidad de Vehículos</label>
+                        <input type="number" class="input-glow" placeholder="10" required>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Mensaje</label>
+                        <textarea class="input-glow" placeholder="Detalla los requerimientos de tu operación..."></textarea>
+                    </div>
+
+                    <div class="form-group full" style="margin-top: 10px;">
+                        <button type="submit" class="btn-glow" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 1rem;">
+                            SOLICITAR DEMOSTRACIÓN &rarr;
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="logo" style="margin-bottom: 12px;">
+                        <div class="logo-dot"></div>
+                        CLEVORA
+                    </a>
+                    <p style="color: var(--text-dim); font-size: 0.9rem; max-width: 320px;">
+                        Inteligencia de movilidad para tu operación. Control total de tu flota en tiempo real.
+                    </p>
+                </div>
+                <a href="#contacto" class="btn-glow">SOLICITAR DEMO</a>
+            </div>
+
+            <div class="footer-bottom">
+                <div>&copy; 2026 Clevora. Todos los derechos reservados.</div>
+                <div class="footer-links">
+                    <a href="#">Privacidad</a>
+                    <a href="#">Términos</a>
+                    <a href="#">Seguridad</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript 3D Scene & Animations -->
+    <script>
+        // Smooth Scroll Lenis
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Three.js 3D Universe Setup
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x02040a, 0.0015);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 15);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- PLANET GROUP ---
+        const planetGroup = new THREE.Group();
+        scene.add(planetGroup);
+        
+        planetGroup.position.set(0, -3.2, 10);
+        planetGroup.rotation.x = 0.4;
+
+        // Texture Generator
+        function createTechEarthTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#030814';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Tech Grid Lines
+            ctx.strokeStyle = '#00f0ff';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.2;
+            for(let i = 0; i < canvas.width; i += 32) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for(let j = 0; j < canvas.height; j += 32) {
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(canvas.width, j);
+                ctx.stroke();
+            }
+
+            // Data Nodes
+            ctx.fillStyle = '#00f0ff';
+            for(let k = 0; k < 400; k++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.globalAlpha = Math.random() * 0.8 + 0.2;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.random() * 2 + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const globeRadius = 4;
+        const globeGeo = new THREE.SphereGeometry(globeRadius, 64, 64);
+        const globeMat = new THREE.MeshPhongMaterial({
+            map: createTechEarthTexture(),
+            color: 0x1a3a5c,
+            emissive: 0x051329,
+            specular: 0x00f0ff,
+            shininess: 25
+        });
+
+        const globe = new THREE.Mesh(globeGeo, globeMat);
+        planetGroup.add(globe);
+
+        // Shell & Atmosphere
+        const shell = new THREE.Mesh(
+            new THREE.SphereGeometry(4.15, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.08 })
+        );
+        planetGroup.add(shell);
+
+        const atmosphere = new THREE.Mesh(
+            new THREE.SphereGeometry(4.3, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.12, side: THREE.BackSide })
+        );
+        planetGroup.add(atmosphere);
+
+        // --- SISTEMA DINÁMICO DE LÍNEAS ANIMADAS Y NODOS ---
+        const connectionArcsGroup = new THREE.Group();
+        planetGroup.add(connectionArcsGroup);
+
+        function latLongToVector3(lat, lon, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const z = (radius * Math.sin(phi) * Math.sin(theta));
+            const y = (radius * Math.cos(phi));
+            return new THREE.Vector3(x, y, z);
+        }
+
+        // Red amplia de coordenadas globales
+        const cityCoords = [
+            { lat: 40.7128, lon: -74.0060 }, // Nueva York
+            { lat: 51.5074, lon: -0.1278 },  // Londres
+            { lat: 35.6762, lon: 139.6503 }, // Tokio
+            { lat: -23.5505, lon: -46.6333 },// São Paulo
+            { lat: 19.4326, lon: -99.1332 }, // México DF
+            { lat: 25.2048, lon: 55.2708 },  // Dubái
+            { lat: -33.8688, lon: 151.2093 },// Sídney
+            { lat: 10.4806, lon: -66.9036 }, // Caracas
+            { lat: 48.8566, lon: 2.3522 },   // París
+            { lat: 1.3521, lon: 103.8198 },  // Singapur
+            { lat: 31.2304, lon: 121.4737 }, // Shanghái
+            { lat: -34.6037, lon: -58.3816 },// Buenos Aires
+            { lat: 37.7749, lon: -122.4194 },// San Francisco
+            { lat: 28.6139, lon: 77.2090 },  // Nueva Delhi
+            { lat: -1.2921, lon: 36.8219 }   // Nairobi
+        ];
+
+        // Nodos base en la superficie
+        const nodeGeo = new THREE.SphereGeometry(0.06, 12, 12);
+        const nodeMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+        cityCoords.forEach(coord => {
+            const pos = latLongToVector3(coord.lat, coord.lon, globeRadius + 0.05);
+            const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
+            nodeMesh.position.copy(pos);
+            connectionArcsGroup.add(nodeMesh);
+        });
+
+        // Clase para controlar cada Arco Animado
+        const activeArcs = [];
+        const MAX_SIMULTANEOUS_ARCS = 35; // Mayor cantidad de conexiones
+
+        class AnimatedArc {
+            constructor() {
+                // Crear objeto de línea reutilizable
+                const MAX_POINTS = 50;
+                this.geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(MAX_POINTS * 3);
+                this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                this.material = new THREE.LineBasicMaterial({
+                    color: 0x00f0ff,
+                    transparent: true,
+                    opacity: 0,
+                    linewidth: 1.5
+                });
+
+                this.mesh = new THREE.Line(this.geometry, this.material);
+                connectionArcsGroup.add(this.mesh);
+
+                this.reset();
+            }
+
+            reset() {
+                // Elegir dos ciudades distintas aleatorias
+                let idx1 = Math.floor(Math.random() * cityCoords.length);
+                let idx2 = Math.floor(Math.random() * cityCoords.length);
+                while (idx1 === idx2) {
+                    idx2 = Math.floor(Math.random() * cityCoords.length);
+                }
+
+                const start = latLongToVector3(cityCoords[idx1].lat, cityCoords[idx1].lon, globeRadius);
+                const end = latLongToVector3(cityCoords[idx2].lat, cityCoords[idx2].lon, globeRadius);
+
+                // Punto medio elevado hacia el espacio
+                const distance = start.distanceTo(end);
+                const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+                mid.normalize().multiplyScalar(globeRadius + distance * 0.35);
+
+                this.curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+                this.allPoints = this.curve.getPoints(50);
+
+                // Variables de ciclo de vida
+                this.progress = 0;
+                this.speed = 0.008 + Math.random() * 0.012; // Velocidad variable
+                this.phase = 'growing'; // 'growing', 'holding', 'fading'
+                this.holdTime = 0;
+                this.maxHold = 15 + Math.random() * 30;
+                this.material.opacity = 0;
+            }
+
+            update() {
+                if (this.phase === 'growing') {
+                    this.progress += this.speed;
+                    this.material.opacity = Math.min(1, this.progress * 2);
+
+                    if (this.progress >= 1) {
+                        this.progress = 1;
+                        this.phase = 'holding';
+                    }
+                } else if (this.phase === 'holding') {
+                    this.holdTime++;
+                    if (this.holdTime >= this.maxHold) {
+                        this.phase = 'fading';
+                    }
+                } else if (this.phase === 'fading') {
+                    this.material.opacity -= 0.03;
+                    if (this.material.opacity <= 0) {
+                        this.reset();
+                    }
+                }
+
+                // Renderizar solo la porción correspondiente al progreso actual
+                const pointCount = Math.floor(this.progress * (this.allPoints.length - 1)) + 1;
+                const positionAttribute = this.geometry.attributes.position;
+
+                for (let i = 0; i < pointCount; i++) {
+                    positionAttribute.setXYZ(i, this.allPoints[i].x, this.allPoints[i].y, this.allPoints[i].z);
+                }
+
+                this.geometry.setDrawRange(0, pointCount);
+                positionAttribute.needsUpdate = true;
+            }
+        }
+
+        // Generar piscina de arcos
+        for (let i = 0; i < MAX_SIMULTANEOUS_ARCS; i++) {
+            const arc = new AnimatedArc();
+            // Desfasar inicio para que no comiencen todos juntos
+            arc.progress = Math.random();
+            activeArcs.push(arc);
+        }
+
+        // --- SATELLITE GROUP ---
+        const soloSatelliteGroup = new THREE.Group();
+        scene.add(soloSatelliteGroup);
+        soloSatelliteGroup.position.set(0, 0, 8);
+        soloSatelliteGroup.scale.set(0, 0, 0);
+
+        const satBody = new THREE.Mesh(
+            new THREE.BoxGeometry(0.8, 0.8, 1.2),
+            new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 })
+        );
+        soloSatelliteGroup.add(satBody);
+
+        const panelMat = new THREE.MeshStandardMaterial({ color: 0x0055ff, metalness: 0.5, roughness: 0.1, emissive: 0x001133 });
+        const panel1 = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.05, 0.8), panelMat);
+        panel1.position.set(1.6, 0, 0);
+        soloSatelliteGroup.add(panel1);
+
+        const panel2 = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.05, 0.8), panelMat);
+        panel2.position.set(-1.6, 0, 0);
+        soloSatelliteGroup.add(panel2);
+
+        const dish = new THREE.Mesh(
+            new THREE.ConeGeometry(0.5, 0.3, 16),
+            new THREE.MeshStandardMaterial({ color: 0x00f0ff, metalness: 0.8 })
+        );
+        dish.rotation.x = Math.PI;
+        dish.position.set(0, 0.6, 0.4);
+        soloSatelliteGroup.add(dish);
+
+        const lightGeo = new THREE.SphereGeometry(0.06, 8, 8);
+        const beaconLight = new THREE.Mesh(
+            lightGeo,
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff })
+        );
+        beaconLight.position.set(0, -0.4, 0.6);
+        soloSatelliteGroup.add(beaconLight);
+
+        // Starfield
+        const starsGeo = new THREE.BufferGeometry();
+        const starCount = 2000;
+        const starPos = new Float32Array(starCount * 3);
+        for(let i = 0; i < starCount; i++) {
+            starPos[i*3] = (Math.random() - 0.5) * 100;
+            starPos[i*3+1] = (Math.random() - 0.5) * 100;
+            starPos[i*3+2] = (Math.random() - 0.5) * 100;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starfield = new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.5 }));
+        scene.add(starfield);
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0x0a192f, 1.5));
+        const dirLight = new THREE.DirectionalLight(0x00f0ff, 2.5);
+        dirLight.position.set(10, 10, 10);
+        scene.add(dirLight);
+
+        const bluePointLight = new THREE.PointLight(0x7000ff, 3, 20);
+        bluePointLight.position.set(-5, -5, 5);
+        scene.add(bluePointLight);
+
+        // Mouse Parallax
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            const glow = document.getElementById('cursorGlow');
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotaciones globales
+            globe.rotation.y += 0.0015;
+            connectionArcsGroup.rotation.y += 0.0015;
+            shell.rotation.y -= 0.001;
+            starfield.rotation.y += 0.0002;
+
+            // Actualizar animación de cada arco
+            activeArcs.forEach(arc => arc.update());
+
+            // Satellite floating animation
+            soloSatelliteGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.3 + elapsedTime * 0.2;
+            soloSatelliteGroup.rotation.x = Math.cos(elapsedTime * 0.3) * 0.2;
+            soloSatelliteGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.2;
+
+            // Light Pulsing
+            beaconLight.material.color.setHSL((elapsedTime % 1), 1, 0.5);
+
+            // Subtle Mouse Tracking
+            planetGroup.rotation.x = 0.4 + mouseY * 0.05;
+            planetGroup.rotation.y = mouseX * 0.05;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize Event
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // GSAP ScrollTrigger Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 1. TRANSICIÓN DEL PLANETA
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "70% bottom",
+                scrub: 1
+            }
+        })
+        .to(planetGroup.position, { x: 3.5, y: -0.5, z: 0 }, 0)
+        .to(planetGroup.rotation, { x: 0.1, z: 0.2 }, 0);
+
+        // 2. CAMBIO A SATÉLITE EN "CONÓCENOS"
+        ScrollTrigger.create({
+            trigger: "#conocenos",
+            start: "top 60%",
+            end: "bottom 20%",
+            onEnter: () => {
+                gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 1, ease: "power2.out" });
+                gsap.to(soloSatelliteGroup.scale, { x: 1, y: 1, z: 1, duration: 1.2, ease: "back.out(1.7)" });
+            },
+            onLeaveBack: () => {
+                gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "power2.out" });
+                gsap.to(soloSatelliteGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, ease: "power2.in" });
+            }
+        });
+
+        // Counters Animation
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            gsap.to(counter, {
+                innerText: target,
+                duration: 2,
+                snap: { innerText: 0.1 },
+                scrollTrigger: {
+                    trigger: counter,
+                    start: "top 85%"
+                }
+            });
+        });
+
+        // Mobility Score Circle & Progress Bars
+        ScrollTrigger.create({
+            trigger: "#score",
+            start: "top 70%",
+            onEnter: () => {
+                document.getElementById('scoreCircle').style.strokeDashoffset = '73.5';
+                document.querySelectorAll('.bar-fill').forEach(bar => {
+                    bar.style.width = bar.getAttribute('data-width');
+                });
+            }
+        });
+
+        // Section Fade-In Reveal
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.from(section, {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+    </script>
+</body>
+</html>
