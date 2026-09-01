@@ -25,6 +25,7 @@
             --blue-glow: #3a7bd5;
             --purple-glow: #7000ff;
             --accent-green: #00ff88;
+            --danger-red: #ff3366;
             --text-main: #f0f4f8;
             --text-dim: #8a99ad;
             --font-head: 'Space Grotesk', 'Orbitron', sans-serif;
@@ -112,23 +113,16 @@
         }
 
         .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.6rem;
-            letter-spacing: 4px;
-            color: #fff;
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            text-decoration: none;
         }
 
-        .logo-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--cyan-glow);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--cyan-glow);
+        .logo img {
+            height: 15px;
+            width: auto;
+            display: block;
+            object-fit: contain;
         }
 
         nav {
@@ -151,6 +145,12 @@
         nav a:hover {
             color: var(--cyan-glow);
             text-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .btn-glow {
@@ -177,6 +177,40 @@
             transform: translateY(-2px);
             color: #fff;
             border-color: #ffffff;
+        }
+
+        /* Hamburger Menu Icon */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 102;
+        }
+
+        .menu-toggle span {
+            width: 100%;
+            height: 2px;
+            background-color: var(--cyan-glow);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 6px var(--cyan-glow);
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
         }
 
         /* Hero Section */
@@ -237,6 +271,7 @@
             display: flex;
             gap: 20px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn-secondary {
@@ -325,7 +360,7 @@
             font-size: 0.85rem;
             letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
             display: block;
         }
 
@@ -336,67 +371,10 @@
             letter-spacing: -0.5px;
         }
 
-        /* Section: Quiénes Somos / Telemetry HUD */
-        .hud-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .hud-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-radius: 20px;
-            padding: 40px;
-            position: relative;
-            backdrop-filter: blur(24px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .hud-card::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            width: 30px;
-            height: 30px;
-            border-top: 2px solid var(--cyan-glow);
-            border-left: 2px solid var(--cyan-glow);
-            border-top-left-radius: 20px;
-        }
-
-        .hud-card p {
-            color: var(--text-dim);
-            line-height: 1.8;
-            font-size: 1.05rem;
-            margin-bottom: 20px;
-        }
-
-        .data-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        .pill {
-            padding: 8px 16px;
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-family: var(--font-head);
-            color: var(--cyan-glow);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
         /* Modules Holographic Cards Grid */
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
 
@@ -468,6 +446,214 @@
             color: var(--text-dim);
             font-size: 0.95rem;
             line-height: 1.6;
+        }
+
+        /* --- SECCIÓN DE VEHÍCULO E INTERACTIVIDAD --- */
+        .car-control-section {
+            padding: 80px 8%;
+        }
+
+        .car-container-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 28px;
+            padding: 40px;
+            backdrop-filter: blur(24px);
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .car-viewport {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            background: #000;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .car-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .car-status-pill {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 6px 14px;
+            background: rgba(2, 4, 10, 0.75);
+            border: 1px solid var(--cyan-glow);
+            border-radius: 20px;
+            font-family: var(--font-head);
+            font-size: 0.75rem;
+            color: var(--cyan-glow);
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        /* Cuadro telemático superpuesto en el lienzo */
+        .telemetry-hud-box {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            padding: 10px 16px;
+            background: rgba(2, 4, 10, 0.85);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            font-family: var(--font-head);
+            font-size: 0.78rem;
+            color: #fff;
+            backdrop-filter: blur(10px);
+            z-index: 5;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            letter-spacing: 1px;
+        }
+
+        .telemetry-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .telemetry-label {
+            color: var(--text-dim);
+        }
+
+        .telemetry-val {
+            color: var(--cyan-glow);
+            font-weight: 700;
+        }
+
+        .telemetry-val.inhibited {
+            color: var(--danger-red);
+        }
+
+        .status-dot-active {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .status-dot-active.stopped {
+            background: var(--danger-red);
+            box-shadow: 0 0 8px var(--danger-red);
+        }
+
+        .car-info-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn-killswitch {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(112, 0, 255, 0.2));
+            border: 1px solid var(--danger-red);
+            color: #fff;
+            border-radius: 14px;
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.25);
+            margin-top: 24px;
+            width: fit-content;
+        }
+
+        .btn-killswitch:hover {
+            box-shadow: 0 0 35px rgba(255, 51, 102, 0.6);
+            transform: translateY(-2px);
+            border-color: #ffffff;
+        }
+
+        .btn-killswitch.resumed {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 240, 255, 0.2));
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.25);
+        }
+
+        .btn-killswitch.resumed:hover {
+            box-shadow: 0 0 35px rgba(0, 255, 136, 0.6);
+        }
+
+        /* Section: Quiénes Somos / Telemetry HUD */
+        .hud-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hud-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 30px;
+            height: 30px;
+            border-top: 2px solid var(--cyan-glow);
+            border-left: 2px solid var(--cyan-glow);
+            border-top-left-radius: 20px;
+        }
+
+        .hud-card p {
+            color: var(--text-dim);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        .data-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .pill {
+            padding: 8px 16px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: var(--font-head);
+            color: var(--cyan-glow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Feature List Styling */
@@ -552,7 +738,6 @@
         .score-label {
             font-size: 0.75rem;
             color: var(--text-dim);
-            letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 4px;
         }
@@ -667,7 +852,7 @@
 
         .input-glow:focus {
             border-color: var(--cyan-glow);
-            background: rgba(0, 240, 255, 0.05);
+            background: rgba(0, 0, 255, 0.05);
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
@@ -702,6 +887,8 @@
             color: var(--text-dim);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-top: 30px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .footer-links {
@@ -719,9 +906,9 @@
             color: var(--cyan-glow);
         }
 
-        /* Responsive */
+        /* Responsive Styles */
         @media (max-width: 992px) {
-            .hud-grid, .dashboard-container {
+            .hud-grid, .dashboard-container, .car-container-box {
                 grid-template-columns: 1fr;
             }
             .form-grid {
@@ -730,8 +917,69 @@
             .form-group.full {
                 grid-column: span 1;
             }
+
+            /* Responsive Hamburger Menu */
+            .menu-toggle {
+                display: flex;
+            }
+
             nav {
-                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                max-width: 320px;
+                height: 100vh;
+                background: rgba(2, 6, 18, 0.96);
+                backdrop-filter: blur(20px);
+                border-left: 1px solid var(--border-glow);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 28px;
+                transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 101;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            }
+
+            nav.active {
+                right: 0;
+            }
+
+            nav a {
+                font-size: 1.1rem;
+            }
+
+            .car-viewport {
+                height: 300px;
+            }
+
+            .telemetry-hud-box {
+                bottom: 12px;
+                right: 12px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header {
+                padding: 18px 5%;
+            }
+            .btn-glow {
+                padding: 10px 20px;
+                font-size: 0.78rem;
+            }
+            .car-container-box {
+                padding: 24px 16px;
+            }
+            .car-viewport {
+                height: 260px;
+            }
+            section {
+                padding: 80px 5%;
+            }
+            .console-box {
+                padding: 30px 20px;
             }
         }
     </style>
@@ -752,17 +1000,26 @@
         <header>
             <a href="#" class="logo">
                 <div class="logo-dot"></div>
-                CLEVORA
+                <img src="logo.png" alt="Logo" />
             </a>
-            <nav>
-                <a href="#conocenos">Conócenos</a>
-                <a href="#soluciones">Soluciones</a>
-                <a href="#caracteristicas">Características</a>
-                <a href="#modulos">Módulos</a>
-                <a href="#score">Mobility Score</a>
-                <a href="#contacto">Contacto</a>
+
+            <nav id="navMenu">
+                <a href="#conocenos" class="nav-link">Conócenos</a>
+                <a href="#soluciones" class="nav-link">Soluciones</a>
+                <a href="#caracteristicas" class="nav-link">Características</a>
+                <a href="#modulos" class="nav-link">Módulos</a>
+                <a href="#score" class="nav-link">Mobility Score</a>
+                <a href="#contacto" class="nav-link">Contacto</a>
             </nav>
-            <a href="#contacto" class="btn-glow">DEMO DIRECTA</a>
+
+            <div class="header-actions">
+                <a href="#contacto" class="btn-glow">DEMO DIRECTA</a>
+                <button class="menu-toggle" id="menuBtn" aria-label="Abrir Menú">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </header>
 
         <!-- Hero Section -->
@@ -830,6 +1087,43 @@
                     </div>
                     <h3>Gestión Eficiente</h3>
                     <p>Automatización de mantenimientos, control riguroso de consumo de combustible e historial operativo completo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE DETECCIÓN Y APAGADO REMOTO (VEHÍCULO ANIMADO + CUADRO TELEMÁTICO) -->
+        <section class="car-control-section">
+            <div class="car-container-box">
+                <div class="car-viewport">
+                    <div class="car-status-pill">
+                        <div class="status-dot-active" id="statusDot"></div>
+                        <span id="statusText">EN TRÁNSITO - TELEMETRÍA OK</span>
+                    </div>
+
+                    <!-- Cuadro Telemático en Tiempo Real -->
+                    <div class="telemetry-hud-box">
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">VELOCIDAD:</span>
+                            <span class="telemetry-val" id="hudSpeed">108 KM/H</span>
+                        </div>
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">SISTEMA:</span>
+                            <span class="telemetry-val" id="hudSystem">ACTIVO</span>
+                        </div>
+                    </div>
+
+                    <canvas id="carAnimCanvas" class="car-canvas"></canvas>
+                </div>
+
+                <div class="car-info-content">
+                    <span class="section-subtitle">// CONTROL OPERATIVO INMEDIATO</span>
+                    <h2 class="section-title" style="font-size: 2.2rem; margin-bottom: 12px;">Estadísticas en tiempo real</h2>
+                    <p style="color: var(--text-dim); line-height: 1.7; font-size: 1.05rem;">
+                        Y si algo no anda bien, toma el mando remoto de forma instantánea.
+                    </p>
+                    <button id="toggleCarBtn" class="btn-killswitch">
+                        Detenlo al instante
+                    </button>
                 </div>
             </div>
         </section>
@@ -1062,8 +1356,7 @@
             <div class="footer-content">
                 <div>
                     <a href="#" class="logo" style="margin-bottom: 12px;">
-                        <div class="logo-dot"></div>
-                        CLEVORA
+                        <img src="logo.png" alt="Logo" />
                     </a>
                     <p style="color: var(--text-dim); font-size: 0.9rem; max-width: 320px;">
                         Inteligencia de movilidad para tu operación. Control total de tu flota en tiempo real.
@@ -1083,7 +1376,7 @@
         </footer>
     </div>
 
-    <!-- JavaScript 3D Scene & Animations -->
+    <!-- JavaScript 3D Scene, Car Simulation & Responsive Toggle -->
     <script>
         // Smooth Scroll Lenis
         const lenis = new Lenis({
@@ -1097,6 +1390,23 @@
             requestAnimationFrame(raf);
         }
         requestAnimationFrame(raf);
+
+        // --- MENÚ HAMBURGUESA RESPONSIVE ---
+        const menuBtn = document.getElementById('menuBtn');
+        const navMenu = document.getElementById('navMenu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuBtn.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
 
         // Three.js 3D Universe Setup
         const container = document.getElementById('webgl-container');
@@ -1128,7 +1438,6 @@
             ctx.fillStyle = '#030814';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Tech Grid Lines
             ctx.strokeStyle = '#00f0ff';
             ctx.lineWidth = 1;
             ctx.globalAlpha = 0.2;
@@ -1145,7 +1454,6 @@
                 ctx.stroke();
             }
 
-            // Data Nodes
             ctx.fillStyle = '#00f0ff';
             for(let k = 0; k < 400; k++) {
                 const x = Math.random() * canvas.width;
@@ -1198,26 +1506,24 @@
             return new THREE.Vector3(x, y, z);
         }
 
-        // Red amplia de coordenadas globales
         const cityCoords = [
-            { lat: 40.7128, lon: -74.0060 }, // Nueva York
-            { lat: 51.5074, lon: -0.1278 },  // Londres
-            { lat: 35.6762, lon: 139.6503 }, // Tokio
-            { lat: -23.5505, lon: -46.6333 },// São Paulo
-            { lat: 19.4326, lon: -99.1332 }, // México DF
-            { lat: 25.2048, lon: 55.2708 },  // Dubái
-            { lat: -33.8688, lon: 151.2093 },// Sídney
-            { lat: 10.4806, lon: -66.9036 }, // Caracas
-            { lat: 48.8566, lon: 2.3522 },   // París
-            { lat: 1.3521, lon: 103.8198 },  // Singapur
-            { lat: 31.2304, lon: 121.4737 }, // Shanghái
-            { lat: -34.6037, lon: -58.3816 },// Buenos Aires
-            { lat: 37.7749, lon: -122.4194 },// San Francisco
-            { lat: 28.6139, lon: 77.2090 },  // Nueva Delhi
-            { lat: -1.2921, lon: 36.8219 }   // Nairobi
+            { lat: 40.7128, lon: -74.0060 },
+            { lat: 51.5074, lon: -0.1278 },
+            { lat: 35.6762, lon: 139.6503 },
+            { lat: -23.5505, lon: -46.6333 },
+            { lat: 19.4326, lon: -99.1332 },
+            { lat: 25.2048, lon: 55.2708 },
+            { lat: -33.8688, lon: 151.2093 },
+            { lat: 10.4806, lon: -66.9036 },
+            { lat: 48.8566, lon: 2.3522 },
+            { lat: 1.3521, lon: 103.8198 },
+            { lat: 31.2304, lon: 121.4737 },
+            { lat: -34.6037, lon: -58.3816 },
+            { lat: 37.7749, lon: -122.4194 },
+            { lat: 28.6139, lon: 77.2090 },
+            { lat: -1.2921, lon: 36.8219 }
         ];
 
-        // Nodos base en la superficie
         const nodeGeo = new THREE.SphereGeometry(0.06, 12, 12);
         const nodeMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
         cityCoords.forEach(coord => {
@@ -1227,13 +1533,11 @@
             connectionArcsGroup.add(nodeMesh);
         });
 
-        // Clase para controlar cada Arco Animado
         const activeArcs = [];
-        const MAX_SIMULTANEOUS_ARCS = 35; // Mayor cantidad de conexiones
+        const MAX_SIMULTANEOUS_ARCS = 35;
 
         class AnimatedArc {
             constructor() {
-                // Crear objeto de línea reutilizable
                 const MAX_POINTS = 50;
                 this.geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(MAX_POINTS * 3);
@@ -1253,7 +1557,6 @@
             }
 
             reset() {
-                // Elegir dos ciudades distintas aleatorias
                 let idx1 = Math.floor(Math.random() * cityCoords.length);
                 let idx2 = Math.floor(Math.random() * cityCoords.length);
                 while (idx1 === idx2) {
@@ -1263,7 +1566,6 @@
                 const start = latLongToVector3(cityCoords[idx1].lat, cityCoords[idx1].lon, globeRadius);
                 const end = latLongToVector3(cityCoords[idx2].lat, cityCoords[idx2].lon, globeRadius);
 
-                // Punto medio elevado hacia el espacio
                 const distance = start.distanceTo(end);
                 const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
                 mid.normalize().multiplyScalar(globeRadius + distance * 0.35);
@@ -1271,10 +1573,9 @@
                 this.curve = new THREE.QuadraticBezierCurve3(start, mid, end);
                 this.allPoints = this.curve.getPoints(50);
 
-                // Variables de ciclo de vida
                 this.progress = 0;
-                this.speed = 0.008 + Math.random() * 0.012; // Velocidad variable
-                this.phase = 'growing'; // 'growing', 'holding', 'fading'
+                this.speed = 0.008 + Math.random() * 0.012;
+                this.phase = 'growing';
                 this.holdTime = 0;
                 this.maxHold = 15 + Math.random() * 30;
                 this.material.opacity = 0;
@@ -1301,7 +1602,6 @@
                     }
                 }
 
-                // Renderizar solo la porción correspondiente al progreso actual
                 const pointCount = Math.floor(this.progress * (this.allPoints.length - 1)) + 1;
                 const positionAttribute = this.geometry.attributes.position;
 
@@ -1314,10 +1614,8 @@
             }
         }
 
-        // Generar piscina de arcos
         for (let i = 0; i < MAX_SIMULTANEOUS_ARCS; i++) {
             const arc = new AnimatedArc();
-            // Desfasar inicio para que no comiencen todos juntos
             arc.progress = Math.random();
             activeArcs.push(arc);
         }
@@ -1399,24 +1697,19 @@
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
 
-            // Rotaciones globales
             globe.rotation.y += 0.0015;
             connectionArcsGroup.rotation.y += 0.0015;
             shell.rotation.y -= 0.001;
             starfield.rotation.y += 0.0002;
 
-            // Actualizar animación de cada arco
             activeArcs.forEach(arc => arc.update());
 
-            // Satellite floating animation
             soloSatelliteGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.3 + elapsedTime * 0.2;
             soloSatelliteGroup.rotation.x = Math.cos(elapsedTime * 0.3) * 0.2;
             soloSatelliteGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.2;
 
-            // Light Pulsing
             beaconLight.material.color.setHSL((elapsedTime % 1), 1, 0.5);
 
-            // Subtle Mouse Tracking
             planetGroup.rotation.x = 0.4 + mouseY * 0.05;
             planetGroup.rotation.y = mouseX * 0.05;
 
@@ -1429,12 +1722,12 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            resizeCarCanvas();
         });
 
         // GSAP ScrollTrigger Animations
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. TRANSICIÓN DEL PLANETA
         gsap.timeline({
             scrollTrigger: {
                 trigger: "body",
@@ -1446,7 +1739,6 @@
         .to(planetGroup.position, { x: 3.5, y: -0.5, z: 0 }, 0)
         .to(planetGroup.rotation, { x: 0.1, z: 0.2 }, 0);
 
-        // 2. CAMBIO A SATÉLITE EN "CONÓCENOS"
         ScrollTrigger.create({
             trigger: "#conocenos",
             start: "top 60%",
@@ -1500,6 +1792,179 @@
                     toggleActions: "play none none reverse"
                 }
             });
+        });
+
+        // --- LÓGICA DE ANIMACIÓN CON SUAVIZADO Y TELEMETRÍA DINÁMICA ---
+        const carCanvas = document.getElementById('carAnimCanvas');
+        const carCtx = carCanvas.getContext('2d');
+        
+        let carIsRunning = true;
+        let carSpeedFactor = 1; // Control de velocidad progresiva (0 a 1)
+        let roadOffset = 0;
+        let wheelAngle = 0;
+
+        // Referencias a elementos telemáticos HUD
+        const hudSpeed = document.getElementById('hudSpeed');
+        const hudSystem = document.getElementById('hudSystem');
+
+        function resizeCarCanvas() {
+            if (carCanvas.parentElement) {
+                carCanvas.width = carCanvas.parentElement.clientWidth;
+                carCanvas.height = carCanvas.parentElement.clientHeight;
+            }
+        }
+        resizeCarCanvas();
+
+        function drawCyberCar() {
+            const w = carCanvas.width;
+            const h = carCanvas.height;
+            carCtx.clearRect(0, 0, w, h);
+
+            // Suavizado progresivo de la velocidad (Aceleración / Frenado progresivo)
+            const targetSpeedFactor = carIsRunning ? 1 : 0;
+            carSpeedFactor += (targetSpeedFactor - carSpeedFactor) * 0.04;
+
+            // Actualización visual del cuadro telemático en función del factor de velocidad
+            const currentKm = Math.round(carSpeedFactor * 108);
+            hudSpeed.textContent = `${currentKm} KM/H`;
+
+            if (carSpeedFactor < 0.02 && !carIsRunning) {
+                hudSystem.textContent = "INHIBIDO";
+                hudSystem.classList.add('inhibited');
+            } else {
+                hudSystem.textContent = "ACTIVO";
+                hudSystem.classList.remove('inhibited');
+            }
+
+            // Fondo gradiente
+            const bgGrd = carCtx.createLinearGradient(0, 0, 0, h);
+            bgGrd.addColorStop(0, '#020612');
+            bgGrd.addColorStop(1, '#000000');
+            carCtx.fillStyle = bgGrd;
+            carCtx.fillRect(0, 0, w, h);
+
+            // Suelo reflectante y líneas de velocidad
+            const groundY = h * 0.72;
+            carCtx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
+            carCtx.lineWidth = 1;
+            carCtx.beginPath();
+            carCtx.moveTo(0, groundY);
+            carCtx.lineTo(w, groundY);
+            carCtx.stroke();
+
+            // Líneas horizontales de carretera desplazándose a la izquierda (Simula avance a la derecha)
+            roadOffset = (roadOffset - 8 * carSpeedFactor) % 40;
+            carCtx.strokeStyle = 'rgba(0, 240, 255, 0.12)';
+
+            for (let x = w + roadOffset; x > -80; x -= 40) {
+                carCtx.beginPath();
+                carCtx.moveTo(x, groundY);
+                carCtx.lineTo(x + 20, h); // Inclinación ajustada hacia adelante (+20 en lugar de -20)
+                carCtx.stroke();
+            }
+
+            // Parámetros del Vehículo
+            const carW = Math.min(380, w * 0.72);
+            const carH = carW * 0.34;
+            const carX = (w - carW) / 2;
+            const carY = groundY - carH + 12;
+
+            // Color e iluminación adaptativa según la aceleración / estado
+            const glowColor = carSpeedFactor > 0.2 ? '#00f0ff' : '#ff3366';
+
+            carCtx.save();
+            carCtx.shadowColor = glowColor;
+            carCtx.shadowBlur = 18 * Math.max(0.3, carSpeedFactor);
+            carCtx.strokeStyle = glowColor;
+            carCtx.lineWidth = 2.5;
+
+            // Silueta del Vehículo Orientada hacia la DERECHA
+            carCtx.beginPath();
+            carCtx.moveTo(carX + carW * 0.95, carY + carH * 0.72);
+            carCtx.bezierCurveTo(carX + carW * 0.92, carY + carH * 0.58, carX + carW * 0.82, carY + carH * 0.46, carX + carW * 0.72, carY + carH * 0.42);
+            carCtx.bezierCurveTo(carX + carW * 0.64, carY + carH * 0.32, carX + carW * 0.58, carY + carH * 0.20, carX + carW * 0.50, carY + carH * 0.20);
+            carCtx.bezierCurveTo(carX + carW * 0.38, carY + carH * 0.20, carX + carW * 0.30, carY + carH * 0.25, carX + carW * 0.24, carY + carH * 0.35);
+            carCtx.bezierCurveTo(carX + carW * 0.15, carY + carH * 0.48, carX + carW * 0.06, carY + carH * 0.55, carX + carW * 0.02, carY + carH * 0.68);
+            carCtx.bezierCurveTo(carX + carW * 0.02, carY + carH * 0.74, carX + carW * 0.06, carY + carH * 0.78, carX + carW * 0.10, carY + carH * 0.78);
+            carCtx.lineTo(carX + carW * 0.92, carY + carH * 0.78);
+            carCtx.bezierCurveTo(carX + carW * 0.95, carY + carH * 0.78, carX + carW * 0.97, carY + carH * 0.75, carX + carW * 0.95, carY + carH * 0.72);
+            carCtx.closePath();
+            carCtx.stroke();
+
+            // Ventana Lateral
+            carCtx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+            carCtx.lineWidth = 1.5;
+            carCtx.beginPath();
+            carCtx.moveTo(carX + carW * 0.68, carY + carH * 0.42);
+            carCtx.bezierCurveTo(carX + carW * 0.60, carY + carH * 0.30, carX + carW * 0.55, carY + carH * 0.25, carX + carW * 0.48, carY + carH * 0.25);
+            carCtx.bezierCurveTo(carX + carW * 0.38, carY + carH * 0.25, carX + carW * 0.32, carY + carH * 0.30, carX + carW * 0.28, carY + carH * 0.42);
+            carCtx.closePath();
+            carCtx.stroke();
+
+            // Luz Trasera (Roja) a la IZQUIERDA
+            carCtx.fillStyle = '#ff3366';
+            carCtx.fillRect(carX + carW * 0.03, carY + carH * 0.58, carW * 0.04, 5);
+
+            // Faro Delantero (Azul/Blanco) a la DERECHA
+            carCtx.fillStyle = carSpeedFactor > 0.2 ? '#00f0ff' : '#ffffff';
+            carCtx.fillRect(carX + carW * 0.89, carY + carH * 0.58, carW * 0.05, 4);
+
+            // Ruedas Holográficas en rotación correcta
+            const rRadius = carH * 0.26;
+            const r1X = carX + carW * 0.22;
+            const r2X = carX + carW * 0.72;
+            const rY = carY + carH * 0.75;
+
+            wheelAngle += 0.12 * carSpeedFactor;
+
+            [r1X, r2X].forEach(rx => {
+                carCtx.save();
+                carCtx.translate(rx, rY);
+                carCtx.rotate(wheelAngle);
+
+                carCtx.strokeStyle = glowColor;
+                carCtx.lineWidth = 3;
+                carCtx.beginPath();
+                carCtx.arc(0, 0, rRadius, 0, Math.PI * 2);
+                carCtx.stroke();
+
+                carCtx.lineWidth = 1.5;
+                for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
+                    carCtx.beginPath();
+                    carCtx.moveTo(0, 0);
+                    carCtx.lineTo(Math.cos(a) * rRadius, Math.sin(a) * rRadius);
+                    carCtx.stroke();
+                }
+                carCtx.restore();
+            });
+
+            carCtx.restore();
+
+            requestAnimationFrame(drawCyberCar);
+        }
+        drawCyberCar();
+
+        // Control del Apagado Remoto
+        const toggleBtn = document.getElementById('toggleCarBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        toggleBtn.addEventListener('click', () => {
+            carIsRunning = !carIsRunning;
+
+            if (carIsRunning) {
+                toggleBtn.textContent = 'Detenlo al instante';
+                toggleBtn.classList.remove('resumed');
+                statusDot.classList.remove('stopped');
+                statusText.textContent = 'EN TRÁNSITO - TELEMETRÍA OK';
+                statusText.style.color = 'var(--cyan-glow)';
+            } else {
+                toggleBtn.textContent = 'Reanudar marcha';
+                toggleBtn.classList.add('resumed');
+                statusDot.classList.add('stopped');
+                statusText.textContent = 'UNIDAD DETENIDA - BLOQUEO REMOTO';
+                statusText.style.color = 'var(--danger-red)';
+            }
         });
     </script>
 </body>
