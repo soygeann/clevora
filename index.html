@@ -19,8 +19,8 @@
     <style>
     /* Declara el archivo exactamente con su nombre original */
     @font-face {
-        font-family: 'ClevoraBrand';
-        src: url('Unnamed-Regular.otf') format('opentype');
+        font-family: 'fauna';
+        src: url('assets/fonts/fauna-thin.otf') format('opentype');
         font-weight: normal;
         font-style: normal;
         font-display: swap;
@@ -39,7 +39,7 @@
         --text-dim: #8a99ad;
 
         /* Asigna la tipografía a la variable de títulos */
-        --font-head: 'ClevoraBrand', 'Space Grotesk', sans-serif;
+        --font-head: 'fauna', 'Space Grotesk', sans-serif;
         --font-body: 'Sora', sans-serif;
     }
 
@@ -146,7 +146,7 @@
             color: var(--text-dim);
             text-decoration: none;
             font-size: 0.9rem;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             text-transform: uppercase;
             letter-spacing: 1.5px;
             transition: 0.3s;
@@ -171,7 +171,7 @@
             color: #fff;
             border-radius: 30px;
             font-family: var(--font-head);
-            font-weight: 600;
+            /* font-weight: 600; */
             font-size: 0.85rem;
             letter-spacing: 1px;
             cursor: pointer;
@@ -244,7 +244,7 @@
             border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 20px;
             font-size: 0.75rem;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             letter-spacing: 2px;
             color: var(--cyan-glow);
             width: fit-content;
@@ -254,7 +254,7 @@
 
         .hero h1 {
             font-family: var(--font-head);
-            font-size: clamp(2.8rem, 6.5vw, 5.5rem);
+            font-size: clamp(1.4rem, 6.5vw, 4.5rem);
             font-weight: 800;
             line-height: 1.05;
             letter-spacing: -1px;
@@ -366,7 +366,7 @@
         }
 
         .section-subtitle {
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             color: var(--cyan-glow);
             font-size: 0.85rem;
             letter-spacing: 3px;
@@ -506,7 +506,7 @@
             background: rgba(2, 4, 10, 0.75);
             border: 1px solid var(--cyan-glow);
             border-radius: 20px;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             font-size: 0.75rem;
             color: var(--cyan-glow);
             letter-spacing: 1.5px;
@@ -526,14 +526,14 @@
             background: rgba(2, 4, 10, 0.85);
             border: 1px solid var(--border-glow);
             border-radius: 12px;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             font-size: 0.78rem;
             color: #fff;
             backdrop-filter: blur(10px);
             z-index: 5;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
             display: flex;
-            flex-direction: column;
+            flex-direction: column-reverse;
             gap: 4px;
             letter-spacing: 1px;
         }
@@ -660,7 +660,7 @@
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 12px;
             font-size: 0.8rem;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
             color: var(--cyan-glow);
             display: flex;
             align-items: center;
@@ -769,12 +769,12 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.9rem;
-            font-family: var(--font-head);
+            font-family: var(--font-body);
         }
 
         .metric-info span:last-child {
             color: var(--cyan-glow);
-            font-weight: 600;
+            /* font-weight: 600; */
         }
 
         .bar-bg {
@@ -966,9 +966,9 @@
             }
 
             .telemetry-hud-box {
-                bottom: 12px;
-                right: 12px;
-                font-size: 0.7rem;
+                bottom: 5px;
+                right: 8px;
+                font-size: 0.5rem;
             }
         }
 
@@ -976,9 +976,9 @@
             header {
                 padding: 18px 5%;
             }
-            .btn-glow {
+            .btn-glow, .btn-secondary {
                 padding: 10px 20px;
-                font-size: 0.78rem;
+                font-size: 0.4rem;
             }
             .car-container-box {
                 padding: 24px 16px;
@@ -991,6 +991,9 @@
             }
             .console-box {
                 padding: 30px 20px;
+            }
+            .telemetry-hud-box {
+                flex-direction: row;
             }
         }
     </style>
@@ -1144,7 +1147,7 @@
             <div class="hud-grid">
                 <div class="hud-card">
                     <span class="section-subtitle">// PLATAFORMA DE ALTO RENDIMIENTO</span>
-                    <h3 style="font-family: var(--font-head); color: #fff; font-size: 1.8rem; margin-bottom: 16px;">Infraestructura y Tecnología</h3>
+                    <h3 style="font-family: var(--font-head); color: #fff; font-size: 1.5rem; margin-bottom: 16px;">Infraestructura y Tecnología</h3>
                     <p>Arquitectura escalable basada en la nube que permite visibilidad completa sobre activos terrestres sin demoras.</p>
                     <div class="data-pills">
                         <div class="pill">⚡ 0.2s RESPUESTA</div>
@@ -1317,7 +1320,7 @@
                 </div>
 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="font-family: var(--font-head); font-size: 1.8rem; color: #fff;">Lleva tu flota al siguiente nivel</h2>
+                    <h2 style="font-family: var(--font-head); font-size: 1.5rem; color: #fff;">Lleva tu flota al siguiente nivel</h2>
                     <p style="color: var(--text-dim); font-size: 0.95rem; margin-top: 8px;">
                         Optimiza costos, mejora la seguridad y obtén control absoluto en tiempo real. Déjanos tus datos para agendar una demostración en vivo.
                     </p>
