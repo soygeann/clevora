@@ -17,20 +17,31 @@
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
 
     <style>
-        :root {
-            --bg-dark: #02040a;
-            --bg-card: rgba(10, 16, 30, 0.55);
-            --border-glow: rgba(0, 210, 255, 0.25);
-            --cyan-glow: #ffffff;
-            --blue-glow: #3a7bd5;
-            --purple-glow: #ffffff;
-            --accent-green: #00ff88;
-            --danger-red: #ff3366;
-            --text-main: #f0f4f8;
-            --text-dim: #8a99ad;
-            --font-head: 'Space Grotesk', 'Orbitron', sans-serif;
-            --font-body: 'Sora', sans-serif;
-        }
+    /* Declara el archivo exactamente con su nombre original */
+    @font-face {
+        font-family: 'ClevoraBrand';
+        src: url('Unnamed-Regular.otf') format('opentype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    :root {
+        --bg-dark: #02040a;
+        --bg-card: rgba(10, 16, 30, 0.55);
+        --border-glow: rgba(0, 210, 255, 0.25);
+        --cyan-glow: #ffffff;
+        --blue-glow: #3a7bd5;
+        --purple-glow: #ffffff;
+        --accent-green: #00ff88;
+        --danger-red: #ff3366;
+        --text-main: #f0f4f8;
+        --text-dim: #8a99ad;
+
+        /* Asigna la tipografía a la variable de títulos */
+        --font-head: 'ClevoraBrand', 'Space Grotesk', sans-serif;
+        --font-body: 'Sora', sans-serif;
+    }
 
         * {
             margin: 0;
